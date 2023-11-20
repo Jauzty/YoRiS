@@ -5,37 +5,39 @@ Created on Mon Oct 23 12:38:08 2023
 @author: aust_
 """
 import numpy as np
-from UedaXLF_to_RLF import fradioueda21, fradioFRII, fradioueda
-from dutyforspecz import dutyforspecz, bin_edges
-from QLFs_to_duty_cycles import Phixbol24, Phixbol20, Lboll, Lunif, l_2500, PhiBbol, Lboloptdata, sigmaBbold, sigmaBbolu, LBdata
-from Lr_Lkin_convolution import KLF_FRI_FRII, LR, Rx_values, z, Lmin
+from QLFs_to_duty_cycles import Lboll, Lboloptdata
+from Lr_Lkin_convolution import KLF_FRI_FRII, LR, Rx_values, z, Lmin, Lrr
 from scipy.integrate import simps
 
-lrmin = 30 #erg/s
-lrmax = 47
-Lr_values = np.linspace(lrmin, lrmax, 1000)
-Phir = fradioueda(z, Rx_values, Lr_values, Lmin)
-PhiradioII = dutyforspecz(Lunif, l_2500, PhiBbol, Lboloptdata, sigmaBbold, sigmaBbolu, LBdata, bin_edges, z)
-Phir21, Phirgaus21, P = fradioueda21(z, Rx_values, Lr_values, Lmin)
-Phikin, PhikinFRII, Phikin21conv, kin, kkin = KLF_FRI_FRII(LR, Rx_values, z)
-Phirgaus = fradioFRII(z, Rx_values, Lr_values, Lmin)
-jac = np.abs(np.gradient(P, kin))
-Jac = np.abs(np.gradient(P, kkin))
-Phikin21 = Phir21*jac #obtain Phikin for two different absorbtions without convolution, instead use jacobian 
-PhikinI = Phir*jac
-PhikinFRII21 = Phirgaus21*Jac#similar for PhikinFRII for two absorbtions with different jacobian
-PhikFRII = Phirgaus*Jac
+FRIfracX = [0.0754413, 0.0715513, 0.0629219, 0.0638171, 0.0527830, 0.0948788, 0.1290664, 0.0723229, 0.0323717, 0.1618970, 0.0168045, 0.2352269]
+#FRII frac list
+FRIIfracX = [0.0308062, 0.0565392, 0.0465047, 0.0291714, 0.0165781, 0.0254845, 0.0162047, 0.0194296, 0.0030720, 0.0420260, 0.0217945, 0.0]
 
+alpha = 0.54#constants taken from input.pro
+beta = 22.1
+ar = 0.7 #could consider different values of the exponent to change the slope of FRI/FRII
+fcav = 4.0
+bb = np.log10(7 * fcav) + 36.0
+aa = 0.68
+# Convert radio luminosity LR from W/Hz @ 1.4GHz to W/Hz @ 5GHz
+L5 = LR - ar * np.log10(5 / 1.4)  # L5 is in W/Hz @ 5GHz
+# Convert L5 to erg/s @ 5GHz
+L5r = L5 + 7 + 9 + np.log10(5)  # L5r is in erg/s @ 5GHz
+# Calculate kinetic luminosity kin
+kin = alpha * (L5r) + beta   
+# Calculate kinetic luminosity kkin
+kkin = aa * (LR - 25) + bb + 7.0  # kkin is in erg/s
 
 def gkFRI(z):
     
-    red=[0.5, 0.9, 1.25, 1.6, 2.0, 2.4, 2.8, 3.25, 3.75, 4.25, 4.75]
+    red=[0.5, 0.9, 1.2, 1.6, 2.0, 2.4, 2.8, 3.2, 3.8, 4.2, 4.8]
     gkin22I=[0.3, 0.25, 0.13, 0.13, 0.08, 0.07, 0.06, 0.06,0.05,0.08,0.08]
     gkin22I_03=[0.35, 0.3, 0.25, 0.15, 0.1, 0.1, 0.07, 0.09,0.08,0.08,0.05]
     gkin22I_conv=[0.55, 0.45, 0.35, 0.25, 0.25, 0.22, 0.18, 0.2,0.18,0.18,0.18]
     gkinI=[0.2, 0.15, 0.1, 0.1, 0.06, 0.05, 0.05, 0.05,0.04,0.08,0.07]
     gkinI_03=[0.3, 0.2, 0.2, 0.13, 0.08, 0.08, 0.05, 0.08,0.05,0.08,0.05]
     gkinI_conv=[0.5, 0.4, 0.3, 0.25, 0.2, 0.15, 0.13, 0.15,0.15,0.15,0.15]
+    gknew =[0.045820312500000106, 0.015312500000000166, 0.007919921875000182, 0.005698242187500184, 0.004091796875000187, 0.001306152343750192, 0.0010083007812501923, 0.008935546875000177, 0.00036987304687519356, 0.008935546875000177, 0.0005895996093751932]
     
     gk = 0.0  
     gk_03 = 0.
@@ -54,6 +56,7 @@ def gkFRI(z):
         gk22 = gkin22I[index]
         gk22_03 = gkin22I_03[index]
         gk22_conv = gkin22I_conv[index]
+        newgk = gknew[index]
     
     nk = len(kin)
     LgLbol = np.zeros(nk)
@@ -62,6 +65,7 @@ def gkFRI(z):
     LgLbol22 = np.zeros(nk)
     LgLbol22_03 = np.zeros(nk)
     LgLbol22_conv = np.zeros(nk)
+    LgLbolnew = np.zeros(nk)
     
     # gkin for FRI, comparison in the bolometric plane
     for io in range(nk):
@@ -71,33 +75,16 @@ def gkFRI(z):
         LgLbol22[io] = -np.log10(gk22) + kin[io]
         LgLbol22_03[io] = -np.log10(gk22_03) + kin[io]
         LgLbol22_conv[io] = -np.log10(gk22_conv) + kin[io]
+        LgLbolnew[io] = -np.log10(newgk) + kin[io]
+    #print(gk)
+    #print(f' Lboll/Lglbol is {min(Lboll/LgLbol)}, {max(Lboll/LgLbol)}') 
+    #lkin/lbol = gk, we dont know gk but if we assume we know it and get it right then Lbol/Lbol should == 1
+    return LgLbolnew
     
-    
-    # Omega_rad
-    fradI = Phixbol24 * 10**Lboll
-    OradI = simps(fradI, Lboll)
-    
-    frad21 = Phixbol20 * 10**Lboll
-    Orad21 = simps(frad21, Lboll)
-    
-    # Omega_kin
-    fkinI = Phikin * 10**kin #PhikinI is without convolution and result is very different
-    OkinI = simps(fkinI, kin)
-    
-    fkin21 = Phikin21conv * 10**kin #Phikin21 is without convolution and result very different
-    Okin21 = simps(fkin21, kin)
-    
-    gk1 = OkinI / OradI
-
-    gk21_FRI = Okin21 / Orad21
-    print(f'OradI is {OradI}')
-    print(f'OkinI is {OkinI}')
-    print(f"gk1 is {gk1}")
-    print(f'gk21_FRI is {gk21_FRI}')
     
 def gkFRII(z):
     
-    redII=[0.5, 0.9, 1.25, 1.6, 2.0, 2.4, 2.8, 3.25]
+    redII=[0.5, 0.9, 1.2, 1.6, 2.0, 2.4, 2.8, 3.2]
     gkIIup_conv=[3.5, 1.1, 1., 1., 1.,1., 1.1]
     gkIIup=[3.5, 1.1, 0.8, 1., 1., 1., 1.1]
     gkII21=[0.4, 0.45, 0.5, 0.5, 0.5, 0.55, 0.45,0.45]
@@ -166,34 +153,6 @@ def gkFRII(z):
     # gk from comparison between cumulative distributions:
     # at a fixed bolometric luminosity, the ratio between the FRII and the QSO distributions
     # can't exceed ~ 2 (according to van Velzen)
-    pasL = 0.05
-    cumW = np.cumsum(np.flip(pasL * PhikinFRII21))
-    cumSDSS = np.cumsum(np.flip(pasL * PhiradioII))
-    
-    frad = Phixbol24 * 10**Lboll
-    Orad = simps(frad, Lboll)
-    
-    fkin_2 = PhikinFRII21 * 10**kkin
-    Okin_2 = simps(fkin_2, kkin)
-    
-    fkin = PhikFRII * 10**kkin  # Jacobian of rad to kin is 1.0
-    Okin = simps(fkin, kkin)
-    # Optionally filter data based on Lboloptdata
-    yr = np.where(np.array(Lboloptdata) > 45.5)
-    Ldata = Lboloptdata[yr]
-    Phiopt = PhiradioII[yr]
-    
-    # Calculate radiative power energy density (Omega_rad) for filtered data
-    fradII = Phiopt * 10**Ldata
-    OradII = simps(fradII, Ldata)
-    
-    gkFRII = Okin/Orad #close to right but not
-    gk21_FRII = Okin_2/OradII #couldnt be more wrong not sure why
-    # Print the results
-    print("Okin:", Okin)
-    print("Orad:", Orad)
-    print(f'gkFRII is {gkFRII}')
-    print(f'gk21_FRII is {gk21_FRII}')
     
 
 if __name__ == "__main__":    

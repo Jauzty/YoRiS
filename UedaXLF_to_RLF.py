@@ -151,7 +151,7 @@ def fradioueda21(z, Rx_values, Lr_values, Lmin):
         PP = PFRII(Lx, Lr_values[s], z)
         Phir21[s] = simps(P * Phi_x, Lx)
         Phirgaus21[s] = simps(PP*Phi_x, Lx)
-    return Phir21, Phirgaus21, P, PP
+    return Phir21, Phirgaus21
         
 def fradioFRII( z, Rx_values, Lr_values, Lmin):
     nr = len(Lr_values)
@@ -186,7 +186,7 @@ def fradioFRII( z, Rx_values, Lr_values, Lmin):
     #plt.rcParams['figure.dpi'] = 300
     #plt.ylim(1e-12, 1e-3)
     #plt.show()
-    return Phirgaus, PP
+    return Phirgaus
     
 def fradioueda_mult_z( z_values, Rx_values, Lr_values, Lmin):
     fig, ax = plt.subplots(figsize=(10, 7))

@@ -24,9 +24,9 @@ Lrr = np.linspace(lrmin, lrmax, 1000)
 Lmin = 41
 Lx = np.linspace(41, 49, 1000)
 Rx = np.linspace(-10, 3, 1000)
+LR = np.linspace(15, 32, 1000)
 
-
-def Omega(Lx, Lmin, Lbol, Lrr, Rx, red):
+def Omega(Lx, Lmin, Lbol, Lrr, Rx, red, LR):
     
     n = 1000
     r = len(red)
@@ -97,18 +97,18 @@ def Omega(Lx, Lmin, Lbol, Lrr, Rx, red):
         Phixbol21[ii, :] = PhiLx21[ii, :] * jacbol
         Phixbolall[ii, :] = PhiLxall[ii, :] * jacbol
     
-        Phir[ii, :], P = fradioueda(red[ii], Rx, Lrr, Lmin)
-        Phir21[ii, :], PhirFRII21[ii, :], P21, PP21 = fradioueda21(red[ii], Rx, Lrr, Lmin)
+        Phir[ii, :] = fradioueda(red[ii], Rx, Lrr, Lmin)
+        Phir21[ii, :], PhirFRII21[ii, :] = fradioueda21(red[ii], Rx, Lrr, Lmin)
     
-        PhirFRII[ii, :], PP = fradioFRII(red[ii], Rx, Lrr, Lmin)
+        PhirFRII[ii, :]= fradioFRII(red[ii], Rx, Lrr, Lmin)
     
-        Phik21, blah = kincore(P21, Phir21[ii, :])
-        Phik, kin = kincore(P, Phir[ii, :])
+        Phik21, blah = kincore(LR, Phir21[ii, :])
+        Phik, kin = kincore(LR, Phir[ii, :])
         Phikin21[ii, :] = Phik21
         Phikin[ii, :] = Phik
         
-        PhikFRII21, blah = kinlobe(PP21, PhirFRII21[ii, :], Lr_values)
-        PhikFRII, kkin = kinlobe(PP, PhirFRII[ii, :], Lr_values)
+        PhikFRII21, blah = kinlobe(LR, PhirFRII21[ii, :], Lr_values)
+        PhikFRII, kkin = kinlobe(LR, PhirFRII[ii, :], Lr_values)
         PhikinFRII21[ii, :] = PhikFRII21
         PhikinFRII[ii, :] = PhikFRII
     
@@ -143,12 +143,12 @@ def Omega(Lx, Lmin, Lbol, Lrr, Rx, red):
     
         gkin[ii] = (OkinII[ii] / OradIIbol[ii]) + (OkinI[ii] / OradI[ii])
     
-        print(f'gkinFRI21 is {gkinFRI21}')
-        print(f'gkinFRII21 is {gkinFRII21}')
-        print(f'gkinFRI is {gkinFRI}')
-        print(f'gkinFRII is {gkinFRII}')
-        print(min(Lx), min(kin), min(kkin), min(Lboll))
+    print(f'gkinFRI21 is {gkinFRI21}')
+    print(f'gkinFRII21 is {gkinFRII21}')
+    print(f'gkinFRI is {gkinFRI}')
+    print(f'gkinFRII is {gkinFRII}')
+    print(min(Lx), min(kin), min(kkin), min(Lboll))
     
     return
 
-Omega(Lx, Lmin, Lbol, Lrr, Rx, red)
+Omega(Lx, Lmin, Lbol, Lrr, Rx, red, LR)
