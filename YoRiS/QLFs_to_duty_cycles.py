@@ -140,16 +140,16 @@ def dutySDSSshen(Lunif, l_2500, PhiBbol, Lboloptdata, sigmaBbold, sigmaBbolu, LB
 
     alpha_opt = 0.5
     #extract data from the two relevant files
-    data = readsav(r'C:\Users\aust_\Downloads\shen_catalogue.sav')
+    data = readsav(r'C:\Users\aust_\YoRiS\shen_catalogue.sav')
     z = data['z']
     first_FR_type = data['first_FR_type']
     Lbol = data['lbol'] #change to lopt and Lx for qso lf and xray lf
     LogL3000 = data['logl3000']
     LogL1350 = data['logl1350']
     LogL5100 = data['logl5100']
-    file_path = r'C:\Users\aust_\Downloads\vanvelzen.txt'
+    file_path = r'C:\Users\aust_\\YoRiS\vanvelzen.txt'
     data2 = np.genfromtxt(file_path, names=['bol', 'fracII'], dtype=None, delimiter=None)
-    bol = data2['bol']#should also be converted
+    bol = data2['bol']
     fracII = data2['fracII'] / 100.0
 
     X = Lbol #assuming tagbol == 0 this is the simplest way to create the X array
@@ -179,6 +179,9 @@ def dutySDSSshen(Lunif, l_2500, PhiBbol, Lboloptdata, sigmaBbold, sigmaBbolu, LB
         first_FR_type_values = first_FR_type[bin_indices]
         z1 = zvalues - 0.35
         z2 = zvalues + 0.35
+        Lbol_vals = Lbol[bin_indices]
+        Lbol_vals = Lbol_vals[Lbol_vals != 0]
+        #print(f'Lbol in bin {bin_num} is: {min(Lbol_vals)}, {max(Lbol_vals)}')
         
         #if bin_num <= 6:
             #X = LogL3000 #take 3000A straight from shen catalogue
@@ -305,6 +308,7 @@ def dutySDSSshen(Lunif, l_2500, PhiBbol, Lboloptdata, sigmaBbold, sigmaBbolu, LB
     
         ratiodataII = np.interp(Lboloptdata, Lunif, ratioII)
         ratiodata = np.interp(Lboloptdata, Lunif, ratioI)
+        print(ratiodata)
         ratiodatatot = np.interp(Lboloptdata, Lunif, ratioall)
         Phiradio = PhiBbol * ratiodata
         PhiradioII = PhiBbol * ratiodataII
@@ -326,7 +330,7 @@ def dutySDSSshen(Lunif, l_2500, PhiBbol, Lboloptdata, sigmaBbold, sigmaBbolu, LB
         avg1 = np.nanmean(ratioI)
         avg2 = np.nanmean(ratioII)
         avgall = np.nanmean(ratioall)
-        print(f'in bin {bin_num} avg1 is {avg1}, avg2 is {avg2}, avgall is {avgall}')
+        #print(f'in bin {bin_num} avg1 is {avg1}, avg2 is {avg2}, avgall is {avgall}')
         
         if __name__ == "__main__":
             #plots the datapoints
@@ -394,40 +398,42 @@ def dutySDSSshen(Lunif, l_2500, PhiBbol, Lboloptdata, sigmaBbold, sigmaBbolu, LB
         plt.show()
         
     return PhiradioII
-file_list = glob.glob(r'C:\Users\aust_\Downloads\QLFS\QLF*.txt')
+
+#equivalent to compxopt 
+file_list = glob.glob(r'C:\Users\aust_\YoRiS\QLFS\QLF*.txt')
 file_list.sort()
 #anyone else using this will have to change to their correct directory
-Lx = np.linspace(42.0, 46.5, 1000)
-Lbol = np.linspace(44.0, 48.5, 1000)
+Lx = np.linspace(41, 49, 1000)
+Lbol = np.linspace(40.0, 50, 1000)
 
 if __name__ == "__main__":
     fig, axes = plt.subplots(3, 4, figsize=(22, 14), sharex = True, sharey = True)
     axes = axes.flatten()
 
 for i, file_name in enumerate(file_list): #take the qlf files and separate them based on their z
-    if file_name == r'C:\Users\aust_\Downloads\QLFS\QLF1.txt':
+    if file_name == r'C:\Users\aust_\YoRiS\QLFS\QLF1.txt':
         z = 0.5
-    elif file_name == r'C:\Users\aust_\Downloads\QLFS\QLF2.txt':
+    elif file_name == r'C:\Users\aust_\YoRiS\QLFS\QLF2.txt':
         z = 0.9
-    elif file_name == r'C:\Users\aust_\Downloads\QLFS\QLF3.txt':
-        z = 1.2    
-    elif file_name == r'C:\Users\aust_\Downloads\QLFS\QLF4.txt':
+    elif file_name == r'C:\Users\aust_\YoRiS\QLFS\QLF3.txt':
+        z = 1.2
+    elif file_name == r'C:\Users\aust_\YoRiS\QLFS\QLF4.txt':
         z = 1.6    
-    elif file_name == r'C:\Users\aust_\Downloads\QLFS\QLF5.txt':
+    elif file_name == r'C:\Users\aust_\YoRiS\QLFS\QLF5.txt':
         z = 2.0    
-    elif file_name == r'C:\Users\aust_\Downloads\QLFS\QLF6.txt':
+    elif file_name == r'C:\Users\aust_\YoRiS\QLFS\QLF6.txt':
         z = 2.4    
-    elif file_name == r'C:\Users\aust_\Downloads\QLFS\QLF7.txt':
+    elif file_name == r'C:\Users\aust_\YoRiS\QLFS\QLF7.txt':
         z = 2.8
-    elif file_name == r'C:\Users\aust_\Downloads\QLFS\QLF8.txt':
+    elif file_name == r'C:\Users\aust_\YoRiS\QLFS\QLF8.txt':
         z = 3.2        
-    elif file_name == r'C:\Users\aust_\Downloads\QLFS\QLF9.txt':
+    elif file_name == r'C:\Users\aust_\YoRiS\QLFS\QLF9.txt':
         z = 3.8        
-    elif file_name == r'C:\Users\aust_\Downloads\QLFS\QLFA10.txt':
+    elif file_name == r'C:\Users\aust_\YoRiS\QLFS\QLFA10.txt':
         z = 4.2        
-    elif file_name == r'C:\Users\aust_\Downloads\QLFS\QLFA11.txt':
+    elif file_name == r'C:\Users\aust_\YoRiS\QLFS\QLFA11.txt':
         z = 4.8        
-    elif file_name == r'C:\Users\aust_\Downloads\QLFS\QLFA12.txt':
+    elif file_name == r'C:\Users\aust_\YoRiS\QLFS\QLFA12.txt':
         z = 5.8  
 
     # Use np.genfromtxt to load data with varying number of columns
@@ -465,39 +471,39 @@ for i, file_name in enumerate(file_list): #take the qlf files and separate them 
     Phixbol23=Phi_23*np.abs(np.gradient(Lxx,Lx))
     Phixbol24=Phi_24*np.abs(np.gradient(Lxx,Lx)) #sum of all absorbtions
     
-    Phixbol20frac = np.log10(Phixbol20)-10**FRIfracX[i] #log for comparison and account for fraction of FRI/FRII radio sources in the sample
-    Phixbol21frac = np.log10(Phixbol21)-10**FRIfracX[i]
-    Phixbol22frac = np.log10(Phixbol22)-10**FRIfracX[i]
-    Phixbol23frac = np.log10(Phixbol23)-10**FRIfracX[i]
-    Phixbol24frac = np.log10(Phixbol24)-10**FRIfracX[i]
+    Phixbol20frac = Phixbol20*FRIfracX[i] #log for comparison and account for fraction of FRI/FRII radio sources in the sample
+    Phixbol21frac = Phixbol21*FRIfracX[i]
+    Phixbol22frac = Phixbol22*FRIfracX[i]
+    Phixbol23frac = Phixbol23*FRIfracX[i]
+    Phixbol24frac = Phixbol24*FRIfracX[i]
     
     #print(np.abs(np.gradient(Lboll,Lx)))
     #converting the QLF into the B-band bolometric luminosity
     alpha_opt = 0.5
-    LB=myBolfunc(2,l_kev)
-    kb=l_kev-LB
+    LB=myBolfunc(2,Lbol)
+    kb=Lbol-LB
     LBdata=l_2500+alpha_opt*np.log10(6.7369/11.992)
     LBdata=LBdata + 14 + np.log10(6.7369)
     kbb=np.interp(LBdata,LB,kb)
     Lboloptdata=kbb+LBdata
-    PhiB=(Phi_l_2500)*np.abs(np.gradient(LBdata,l_2500))
-    PhiBd=(Phi_l_2500l)*np.abs(np.gradient(LBdata,l_2500))
-    PhiBu=(Phi_l_2500u)*np.abs(np.gradient(LBdata,l_2500))
-    PhiBbol=PhiB*np.abs(np.gradient(Lboloptdata,LBdata))-(10**FRIfracopt[i]) #account for the fraction of sources in the optical sample
-    PhiBbold=PhiBd*np.abs(np.gradient(Lboloptdata,LBdata))-(10**FRIfracopt[i])
-    PhiBbolu=PhiBu*np.abs(np.gradient(Lboloptdata,LBdata))-(10**FRIfracopt[i])
-    sigmaBbold=PhiBbol - PhiBbold
-    sigmaBbolu=PhiBbolu - PhiBbol
-    
+    PhiB=(10**Phi_l_2500)*np.abs(np.gradient(LBdata,l_2500))
+    PhiBd=(10**Phi_l_2500l)*np.abs(np.gradient(LBdata,l_2500))
+    PhiBu=(10**Phi_l_2500u)*np.abs(np.gradient(LBdata,l_2500))
+    PhiBbol=PhiB*np.abs(np.gradient(Lboloptdata,LBdata))*((FRIfracopt[i])) #account for the fraction of sources in the optical sample
+    PhiBbold=PhiBd*np.abs(np.gradient(Lboloptdata,LBdata))*FRIfracopt[i]
+    PhiBbolu=PhiBu*np.abs(np.gradient(Lboloptdata,LBdata))*FRIfracopt[i]
+    sigmaBbold= (np.log10(PhiBbol) - np.log10(PhiBbold))
+    sigmaBbolu= (np.log10(PhiBbolu) - np.log10(PhiBbol))
+
     if __name__ == "__main__":
         ax = axes[i]
-        ax.plot(Lboll, Phixbol20frac, color='black', linestyle='-', label='NH<21')
-        ax.plot(Lboll, Phixbol21frac, color='red', linestyle='--', label='NH<22')
-        ax.plot(Lboll, Phixbol22frac, color='purple', linestyle='-.', label='NH<23')
-        ax.plot(Lboll, Phixbol23frac, color='green', linestyle=':', label='NH<24')
-        ax.plot(Lboll, Phixbol24frac, color='orange', linestyle=(0, (2, 1)), label='BLF at NH<26')
-        ax.scatter(Lboloptdata, PhiBbol, marker='o', color='navy', s=30, edgecolors='black', label=f'QLF sample at z = {z}')
-        for xi, yi, y_err_lower_i, y_err_upper_i in zip(Lboloptdata, PhiBbol, sigmaBbold, sigmaBbolu):
+        ax.plot(Lboll, np.log10(Phixbol20frac), color='black', linestyle='-', label='NH<21')
+        ax.plot(Lboll, np.log10(Phixbol21frac), color='red', linestyle='--', label='NH<22')
+        ax.plot(Lboll, np.log10(Phixbol22frac), color='purple', linestyle='-.', label='NH<23')
+        ax.plot(Lboll, np.log10(Phixbol23frac), color='green', linestyle=':', label='NH<24')
+        ax.plot(Lboll, np.log10(Phixbol24frac), color='orange', linestyle=(0, (2, 1)), label='BLF at NH<26')
+        ax.scatter(Lboloptdata, np.log10(PhiBbol), marker='o', color='navy', s=30, edgecolors='black', label=f'QLF sample at z = {z}')
+        for xi, yi, y_err_lower_i, y_err_upper_i in zip(Lboloptdata, np.log10(PhiBbol), sigmaBbold, sigmaBbolu):
             ax.errorbar(xi, yi, yerr=[[y_err_lower_i], [y_err_upper_i]], fmt='none', capsize=3, color='navy')
         # sets the axes labels correctly, 3 on the y and 4 on the x axis
         if i // 4 == 2:

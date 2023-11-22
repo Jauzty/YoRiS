@@ -220,17 +220,16 @@ def fradioueda_mult_z( z_values, Rx_values, Lr_values, Lmin):
     #plt.rcParams['figure.dpi'] = 300
     #plt.show()
 
+# Define the grid of Lr, Rx, and redshift values
+lrmin = 30 #erg/s
+lrmax = 47
+z_values = [0.75, 1, 2, 3.5]
+Lr_values = np.linspace(lrmin, lrmax, 1000)
+L_x = 44  # Luminosity range
+z = 1  # Redshift value
+Lmin = 41  # Minimum luminosity
+Rx_values = Lr_values - L_x
 if __name__ == "__main__":
-    # Define the grid of Lr, Rx, and redshift values
-    lrmin = 30 #erg/s
-    lrmax = 47
-    z_values = [0.75, 1, 2, 3.5]
-    Lr_values = np.linspace(lrmin, lrmax, 1000)
-    L_x = 44  # Luminosity range
-    z = 1  # Redshift value
-    Lmin = 41  # Minimum luminosity
-    Rx_values = Lr_values - L_x
-    
     # Call the function to calculate and plot the radio luminosity function
     #fradioueda(z, Rx_values, Lr_values, Lmin)
     #fradioueda_mult_z(z_values, Rx_values, Lr_values, Lmin)
