@@ -67,7 +67,7 @@ for i, (zz, file_name) in enumerate(zip(zvalues, file_list)): #take the qlf file
 
     # Use np.genfromtxt to load data with varying number of columns
     dataQLF = np.genfromtxt(file_name, dtype=float)
-    PhikinFRII, Phikin, Phikin21conv, PhikinFRII21, kin, kkin, Phir21, Phirg21 = KLF_FRI_FRII(Lrr, Rx_values, zz, LR, FRIfracX[i], FRIIfracX[i])
+    PhikinFRII, Phikin, Phikin21conv, PhikinFRII21, kin, kkin, Phir21, Phirg21 = KLF_FRI_FRII(Lrr, zz, LR, FRIfracX[i], FRIIfracX[i])
     print(zz)
     # Extract necessary data columns
     mi2_column = dataQLF[:, 0]
@@ -105,13 +105,13 @@ for i, (zz, file_name) in enumerate(zip(zvalues, file_list)): #take the qlf file
     PhiB=(10**Phi_l_2500)*np.abs(np.gradient(LBdata,l_2500))
     PhiBd=(10**Phi_l_2500l)*np.abs(np.gradient(LBdata,l_2500))
     PhiBu=(10**Phi_l_2500u)*np.abs(np.gradient(LBdata,l_2500))
-    PhiBbol=PhiB*np.abs(np.gradient(Lboloptdata,LBdata))*((FRIIfracopt[i])) #account for the fraction of sources in the optical sample
-    PhiBbold=PhiBd*np.abs(np.gradient(Lboloptdata,LBdata))*FRIIfracopt[i]
-    PhiBbolu=PhiBu*np.abs(np.gradient(Lboloptdata,LBdata))*FRIIfracopt[i]
+    PhiBbol=PhiB*np.abs(np.gradient(Lboloptdata,LBdata))*((FRIfracopt[i])) #account for the fraction of sources in the optical sample
+    PhiBbold=PhiBd*np.abs(np.gradient(Lboloptdata,LBdata))*FRIfracopt[i]
+    PhiBbolu=PhiBu*np.abs(np.gradient(Lboloptdata,LBdata))*FRIfracopt[i]
     sigmaBbold= (np.log10(PhiBbol) - np.log10(PhiBbold))
     sigmaBbolu= (np.log10(PhiBbolu) - np.log10(PhiBbol))
     LgLbol = gkFRI(zz)    
-    Lbolfrii = gkFRII(zz)
+    #Lbolfrii = gkFRII(zz)
     
     # Simplified objective function for optimizing gk alone
     """def objective_function(gk, kkin, LgLbol_target):
@@ -153,7 +153,7 @@ for i, (zz, file_name) in enumerate(zip(zvalues, file_list)): #take the qlf file
     
     if __name__ == "__main__":
         ax = axes[i]
-        ax.plot(Lbolfrii, np.log10(PhikinFRII21), color='black', linestyle='-', label='NH<21')
+        ax.plot(LgLbol, np.log10(Phikin21conv), color='black', linestyle='-', label='NH<21')
         ax.scatter(Lboloptdata, np.log10(PhiBbol), marker='o', color='navy', s=30, edgecolors='black', label=f'QLF sample at z = {z}')
         for xi, yi, y_err_lower_i, y_err_upper_i in zip(Lboloptdata, np.log10(PhiBbol), sigmaBbold, sigmaBbolu):
             ax.errorbar(xi, yi, yerr=[[y_err_lower_i], [y_err_upper_i]], fmt='none', capsize=3, color='navy')

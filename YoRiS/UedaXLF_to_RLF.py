@@ -12,12 +12,24 @@ from scipy.integrate import simps
 
 def Pradio(Lx, L_r, z):
     #Pradio calculates the probability of having a value Lr given a value Lx
-    Norm = 1.0230
-    g_r = 0.369
-    g_l = 1.69
-    Rc = -4.578
-    al = 0.109
-    az = -0.066
+    #this is case 5 we can aslo try case 2 and 4 to see if this effects our gk
+    #Norm = 1.0230 #case 5
+    #Norm = 1.0620 #case 2
+    Norm = 1.0652 #case 4
+    #g_r = 0.369 #case 5
+    #g_r = 0.476 #case 2
+    g_r = 0.429 #case 4
+    #g_l = 1.69 #case 5
+    #g_l = 1.93 #case 2
+    g_l = 1.7 #case 4
+    #Rc = -4.578 #case 5
+    #Rc = -4.313 #case 2
+    Rc = -4.386 #case 4
+    #al = 0.109 #case 5
+    #al= 0 #case 2
+    al = 0.056 #case 4
+    #az = -0.066 #case 5
+    az = 0 #case 2/4
     A = np.sqrt(g_r / g_l)
     # Rx is the discrepancy between radio luminosity and X-ray luminosity for each source
     Rx = L_r - Lx  # Calculate Rx for each L_r
@@ -219,7 +231,25 @@ def fradioueda_mult_z( z_values, Rx_values, Lr_values, Lmin):
     #plt.title('Radio Luminosity Function')
     #plt.rcParams['figure.dpi'] = 300
     #plt.show()
-
+'''
+def callprobability(Lr_values, z, Rx_values, Lmin):
+    nr = len(Lr_values)
+    Lx = np.zeros(nr)
+    temp = np.zeros(nr)
+    for s in range(nr):
+        temp = Lr_values[s] - Rx_values
+        Lx = temp[::-1]
+        P5 = Pradio(Lx, Lr_values[s], z, Norm5, g_r5, g_l5, Rc5, al5, az5)
+        P2 = Pradio(Lx, Lr_values[s], z, Norm2, g_r2, g_l2, Rc2, al2, az24)
+        P4 = Pradio(Lx, Lr_values[s], z, Norm4, g_r4, g_l4, Rc4, al4, az24)
+    plt.plot(Rx_values, P5, label = 'case 5')
+    plt.plot(Rx_values, P2, label = 'case 2')
+    plt.plot(Rx_values, P4, label = 'case 4')
+    plt.title('La-Franca all cases at z = 1')
+    plt.legend()
+    plt.xlabel('Rx')
+    plt.ylabel('P(Rx)')
+'''
 # Define the grid of Lr, Rx, and redshift values
 lrmin = 30 #erg/s
 lrmax = 47
@@ -233,9 +263,11 @@ if __name__ == "__main__":
     # Call the function to calculate and plot the radio luminosity function
     #fradioueda(z, Rx_values, Lr_values, Lmin)
     #fradioueda_mult_z(z_values, Rx_values, Lr_values, Lmin)
+    #callprobability(Lr_values, z, Rx_values, Lmin)
     plt.rcParams['font.size'] = 18
     plt.rcParams['font.family'] = 'serif'
     plt.rcParams['font.weight'] = 'normal'
+    plt.rcParams['figure.dpi'] = 300
     
 
 
