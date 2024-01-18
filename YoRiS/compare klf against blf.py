@@ -67,7 +67,7 @@ for i, (zz, file_name) in enumerate(zip(zvalues, file_list)): #take the qlf file
 
     # Use np.genfromtxt to load data with varying number of columns
     dataQLF = np.genfromtxt(file_name, dtype=float)
-    PhikinFRII, Phikin, Phikin21conv, PhikinFRII21, kin, kkin, Phir21, Phirg21 = KLF_FRI_FRII(Lrr, zz, LR, FRIfracX[i], FRIIfracX[i])
+    PhikinFRII, Phikin, Phikin21conv, PhikinFRII21, kin, kkin, Phir21, Phirg21, Phikinscatter, Phikinscatter2, PhikinFRIIscatter, PhikinFRIIscatter2 = KLF_FRI_FRII(Lrr, zz, LR)
     print(zz)
     # Extract necessary data columns
     mi2_column = dataQLF[:, 0]
@@ -98,6 +98,7 @@ for i, (zz, file_name) in enumerate(zip(zvalues, file_list)): #take the qlf file
     alpha_opt = 0.5
     LB=myBolfunc(2,Lbol)
     kb=Lbol-LB
+    #convert to 4500
     LBdata=l_2500+alpha_opt*np.log10(6.7369/11.992)
     LBdata=LBdata + 14 + np.log10(6.7369)
     kbb=np.interp(LBdata,LB,kb)
@@ -153,7 +154,9 @@ for i, (zz, file_name) in enumerate(zip(zvalues, file_list)): #take the qlf file
     
     if __name__ == "__main__":
         ax = axes[i]
-        ax.plot(LgLbol, np.log10(Phikin21conv), color='black', linestyle='-', label='NH<21')
+        ax.plot(LgLbol, np.log10(Phikin21conv), color='black', linestyle='-', label='no scatter')
+        ax.plot(LgLbol, np.log10(Phikinscatter), color='black', linestyle='--', label='0.25 scatter')
+        ax.plot(LgLbol, np.log10(Phikinscatter2), color='black', linestyle=':', label='0.47 scatter')
         ax.scatter(Lboloptdata, np.log10(PhiBbol), marker='o', color='navy', s=30, edgecolors='black', label=f'QLF sample at z = {z}')
         for xi, yi, y_err_lower_i, y_err_upper_i in zip(Lboloptdata, np.log10(PhiBbol), sigmaBbold, sigmaBbolu):
             ax.errorbar(xi, yi, yerr=[[y_err_lower_i], [y_err_upper_i]], fmt='none', capsize=3, color='navy')

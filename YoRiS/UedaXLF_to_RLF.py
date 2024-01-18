@@ -7,7 +7,7 @@ Created on Mon Sep 11 09:54:36 2023
 
 import numpy as np
 import matplotlib.pyplot as plt
-from Ueda_Updated_Py import Ueda_14
+from Ueda_Updated_Py import Ueda_14, Ueda_mod
 from scipy.integrate import simps
 
 def Pradio(Lx, L_r, z):
@@ -114,7 +114,8 @@ def PFRII(Lx, L_r, z):
     
     return PP
 
-def fradioueda(z, Rx_values, Lr_values, Lmin):
+def fradioueda(z, Lr_values, Lmin):
+    Rx_values = Lr_values - 44
     nr = len(Lr_values)
     Phir = np.zeros(nr)
     Lx = np.zeros(nr)
@@ -142,10 +143,11 @@ def fradioueda(z, Rx_values, Lr_values, Lmin):
     #plt.title('Radio Luminosity Function FRI')
     #plt.rcParams['figure.dpi'] = 300
     #plt.show()
-    return Phir, P
+    return Phir
 
-def fradioueda21(z, Rx_values, Lr_values, Lmin):
+def fradioueda21(z, Lr_values, Lmin):
     nr = len(Lr_values)
+    Rx_values = Lr_values - 44
     Phirgaus21 = np.zeros(nr)
     Phir21 = np.zeros(nr)
     Lx = np.zeros(nr)
@@ -165,7 +167,7 @@ def fradioueda21(z, Rx_values, Lr_values, Lmin):
         Phirgaus21[s] = simps(PP*Phi_x, Lx)
     return Phir21, Phirgaus21
         
-def fradioFRII( z, Rx_values, Lr_values, Lmin):
+def fradioFRII(z, Rx_values, Lr_values, Lmin):
     nr = len(Lr_values)
     Phirgaus = np.zeros(nr)
     Phir = np.zeros(nr)
@@ -177,10 +179,11 @@ def fradioFRII( z, Rx_values, Lr_values, Lmin):
         Lx = temp[::-1]
         Phi_x = np.zeros(nr)
 
-        for i in range(0, 5): #This part is very important, we are summung over all the Nh to calculate the total luminosity function in the Radio
-            Phi_x = Phi_x + Ueda_14(Lx, z, i)
+        for i in range(0, 5): #This part is very important, we are summing over all the Nh to calculate the total luminosity function in the Radio
+            Phi_x = Phi_x + Ueda_mod(Lx, z, i)
             Phi_x[(Lx < Lmin)] = 0
-
+            
+        Phi_x[(Lx < Lmin)] = 0
         PP = PFRII(Lx, Lr_values[s], z)
         P = Pradio(Lx, Lr_values[s], z)
         Phir[s] = simps(P*Phi_x, Lx)
@@ -198,7 +201,7 @@ def fradioFRII( z, Rx_values, Lr_values, Lmin):
     #plt.rcParams['figure.dpi'] = 300
     #plt.ylim(1e-12, 1e-3)
     #plt.show()
-    return Phirgaus
+    return Phir, Phirgaus
     
 def fradioueda_mult_z( z_values, Rx_values, Lr_values, Lmin):
     fig, ax = plt.subplots(figsize=(10, 7))
@@ -261,7 +264,7 @@ Lmin = 41  # Minimum luminosity
 Rx_values = Lr_values - L_x
 if __name__ == "__main__":
     # Call the function to calculate and plot the radio luminosity function
-    #fradioueda(z, Rx_values, Lr_values, Lmin)
+    #fradioFRII(z, Rx_values, Lr_values, Lmin)
     #fradioueda_mult_z(z_values, Rx_values, Lr_values, Lmin)
     #callprobability(Lr_values, z, Rx_values, Lmin)
     plt.rcParams['font.size'] = 18

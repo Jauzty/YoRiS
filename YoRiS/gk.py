@@ -42,8 +42,8 @@ def gkFRI(z):
     #gknew =[0.1, 0.085, 0.065, 0.05, 0.053, 0.037, 0.025, 0.0265, 0.03, 0.022, 0.05] #matched for high luminosity
     #gknew =[0.082, 0.075, 0.045, 0.03, 0.035, 0.023, 0.012, 0.02, 0.025, 0.003, 0.006] #matched for low luminosity case 2
     #gknew =[0.1, 0.08, 0.047, 0.03, 0.035, 0.023, 0.012, 0.02, 0.025, 0.003, 0.006] #matched for low luminosity case 4
-    gknew =[0.065, 0.055, 0.035, 0.025, 0.02, 0.015, 0.015, 0.015, 0.02, 0.02, 0.03] # for new convolution high luminosity
-    
+    #gknew =[0.065, 0.055, 0.035, 0.025, 0.02, 0.015, 0.015, 0.015, 0.02, 0.02, 0.03] #new conv high L no scatter
+    gknew = [0.34, 0.16, 0.11, 0.1, 0.09, 0.08, 0.07, 0.05, 0.05, 0.045, 0.085] #new conv, high L, 0.25 scatter
     tt = np.where(np.array(red) == z)
     if len(tt[0]) > 0:
         index = tt[0][0]  # Get the first matching index

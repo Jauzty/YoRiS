@@ -44,7 +44,7 @@ def convolve(f, y, xmed, x, sigma):
 
     return res
 
-def KLF_FRI_FRII(Lrr, z, LR, FRIfracX, FRIIfracX):
+def KLF_FRI_FRII(Lrr, z, LR):
     alpha = 0.54#constants taken from input.pro
     beta = 22.1
     ar = 0.7 #could consider different values of the exponent to change the slope of FRI/FRII
@@ -111,19 +111,19 @@ def KLF_FRI_FRII(Lrr, z, LR, FRIfracX, FRIIfracX):
     Phirg21 = Phirg21
     Phikin21conv = convolve(Phir21, LR, kin, kin, 0.25)
     Phikin = convolve(Phir, LR, kin, kin, 0.25)
-    Phikinscatter = convolve(Phir, LR, kin, kin, 0.47)
-    Phikinscatter2 = convolve(Phir, LR, kin, kin, 0.7)
+    Phikinscatter = convolve(Phir21, LR, kin, kin, 0.47)
+    Phikinscatter2 = convolve(Phir21, LR, kin, kin, 0.7)
     PhikinFRII = convolve(Phirgaus, LR, kkin, kkin, 0.01)
-    PhikinFRIIscatter = convolve(Phirgaus, LR, kkin, kkin, 0.25)
-    PhikinFRIIscatter2 = convolve(Phirgaus, LR, kkin, kkin, 0.7)
-    PhikinFRII21 = convolve(Phirg21, LR, kkin, kkin, 0.25) #HB
+    PhikinFRIIscatter = convolve(Phirg21, LR, kkin, kkin, 0.25)
+    PhikinFRIIscatter2 = convolve(Phirg21, LR, kkin, kkin, 0.7)
+    PhikinFRII21 = convolve(Phirg21, LR, kkin, kkin, 0.01) #HB
     #PhikinFRII2017 = convolve(Phirg21, Lr_values, kkin2017, kkin2017, 0.25) #ineson
     #PhikinFRII2013 = convolve(Phirg21, Lr_values, kkin2013, kkin2013, 0.25) #shabala
     #PhikinFRII2011 = convolve(Phirg21, Lr_values, kkin2011, kkin2011, 0.25) #o'sullivan 
     #PhikinFRII1999 = convolve(Phirg21, Lr_values, kkin1999, kkin1999, 0.25) #willott
         
     kin_interp = np.linspace(min(kin), max(kkin), 1000)
-    Phikintot = np.interp(kin_interp, kin, Phikin) + np.interp(kin_interp, kkin, PhikinFRII)
+    Phikintot = np.interp(kin_interp, kin, Phikin21conv) + np.interp(kin_interp, kkin, PhikinFRII21)
     Phikintotscatter = np.interp(kin_interp, kin, Phikinscatter) + np.interp(kin_interp, kkin, PhikinFRIIscatter)
     Phikintotscatter2 = np.interp(kin_interp, kin, Phikinscatter2) + np.interp(kin_interp, kkin, PhikinFRIIscatter2)
     #print(max(kin))
@@ -132,8 +132,8 @@ def KLF_FRI_FRII(Lrr, z, LR, FRIfracX, FRIIfracX):
     if __name__ == "__main__":
         fig, ax = plt.subplots(figsize=(10, 7))
         #plt.plot(Lr_values, np.log10(Phir21), label= 'FRI')
-        plt.plot(kin, np.log10(Phikin), label = 'FRI')
-        plt.plot(kkin, np.log10(PhikinFRII), label = 'FRII', color = 'orange')
+        plt.plot(kin, np.log10(Phikin21conv), label = 'FRI')
+        plt.plot(kkin, np.log10(PhikinFRII21), label = 'FRII', color = 'orange')
         plt.plot(kkin, np.log10(PhikinFRIIscatter), linestyle = '--', color = 'orange')
         plt.plot(kkin, np.log10(PhikinFRIIscatter2), linestyle = ':', color = 'orange')
         #plt.plot(kkin2017, np.log10(PhikinFRII2017), label = 'FRII Ineson+2017')
@@ -152,17 +152,17 @@ def KLF_FRI_FRII(Lrr, z, LR, FRIfracX, FRIIfracX):
         plt.ylim(-10.5, -3)
         plt.xlim(42, 48)
         plt.show()
-    return PhikinFRII, Phikin, Phikin21conv, PhikinFRII21, kin, kkin, Phir21, Phirg21
+    return PhikinFRII, Phikin, Phikin21conv, PhikinFRII21, kin, kkin, Phir21, Phirg21, Phikinscatter, Phikinscatter2, PhikinFRIIscatter, PhikinFRIIscatter2
 
-Rx_values = np.linspace(-10, 3, 1000)  # Rx range calculating with LR+(7+np.log10(1.4)+9) -44 does not work idk why
+Rx_values = np.linspace(-10, -1, 1000)  # Rx range calculating with LR+(7+np.log10(1.4)+9) -44 does not work idk why
 #z_values = [1, 2, 3, 4, 5]
 z = 1  # Redshift value
 Lmin = 41  # Minimum luminosity
 Lrr = np.linspace(30, 47, 1000) #erg/s at 5GHz
-LR = Lrr -7-np.log10(5)-9 #luminosity range in W/Hz 1.4 GHz based on federicas code
-#LR is the transformation of Lrr into W/Hz at 1.4 GHz
+LR = Lrr -7-np.log10(5)-9 #luminosity range in W/Hz 5 GHz based on federicas code
+#LR is the transformation of Lrr into W/Hz at 5 GHz
 if __name__ == "__main__":
     plt.rcParams['font.size'] = 16
     plt.rcParams['font.family'] = 'serif'
     plt.rcParams['figure.dpi'] = 300
-    KLF_FRI_FRII(Lrr, z, LR, None, None)
+    KLF_FRI_FRII(Lrr, z, LR)

@@ -482,7 +482,7 @@ for i, file_name in enumerate(file_list): #take the qlf files and separate them 
     alpha_opt = 0.5
     LB=myBolfunc(2,Lbol)
     kb=Lbol-LB
-    LBdata=l_2500+alpha_opt*np.log10(6.7369/11.992)
+    LBdata=l_2500+alpha_opt*np.log10(6.7369/11.992) #use spectral index to convert to bolometric
     LBdata=LBdata + 14 + np.log10(6.7369)
     kbb=np.interp(LBdata,LB,kb)
     Lboloptdata=kbb+LBdata
