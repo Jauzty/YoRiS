@@ -112,6 +112,24 @@ def myBolfunc(TAG, L):
         L_qq = 0.0
         return L_B
     
+    elif TAG == 3:
+        #Duras+2020 hard x ray bolometric correction as a function of the bolometric luminosity
+        a = 10.96 # +- 0.06
+        b = 11.93 # +- 0.01
+        c = 17.79 # +- 0.1
+        L_1 = a * (1 + (Ls/b)**c)
+        L_C= L_1 + 33 + np.log10(4)
+        return L_C # scatter is 0.27
+    
+    elif TAG == 4: 
+        #Duras+2020 hard x ray bolometric correction as a function of the hard x ray luminosity
+        a = 15.33 # +- 0.06
+        b = 11.48 # +- 0.01
+        c = 16.20 # +- 0.16
+        L_2 = a * (1 + ((Ls)/b)**c)
+        L_D= L_2 + 33 + np.log10(4)
+        return L_D # scatter is 0.37
+    
 def reverse_myBolfunc(TAG, L_bol): #opposite of myBolfunc
     
     Ls = L_bol - np.log10(4.0) - 33.0  # to convert to solar Luminosities

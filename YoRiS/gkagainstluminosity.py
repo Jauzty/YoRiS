@@ -11,7 +11,7 @@ from scipy.optimize import minimize
 from Ueda_Updated_Py import Ueda_14, Ueda_mod
 import matplotlib.pyplot as plt
 from QLFs_to_duty_cycles import mi_to_L2500, L2500_to_kev, myBolfunc
-from Lr_Lkin_convolution import KLF_FRI_FRII, LR, Rx_values, Lrr
+from Lr_Lkin_convolution import KLF_FRI_FRII, LR, Lrr
 from gkzfixed import gkFRI
 t1 = time()
 
@@ -19,7 +19,7 @@ Lx = np.linspace(41, 49, 1000)
 Lbol = np.linspace(40.0, 50, 1000)
 Lboldiscrete = [44, 44.5, 45, 45.5, 46, 46.5, 47]
 
-zz = 0.9
+zz = 3.5
 if __name__ == "__main__":
     fig, axes = plt.subplots(2, 4, figsize=(22, 14), sharex = True, sharey = True)
     axes = axes.flatten()
@@ -33,9 +33,9 @@ FRIfracX = [0.0754413, 0.0715513, 0.0629219, 0.0638171, 0.0527830, 0.0948788, 0.
 #FRII frac list
 FRIIfracX = [0.0308062, 0.0565392, 0.0465047, 0.0291714, 0.0165781, 0.0254845, 0.0162047, 0.0194296, 0.0030720, 0.0420260, 0.0217945, 0.0]
 
-file = r'C:\Users\aust_\YoRiS\QLFS\QLF2.txt'
+file = r'C:\Users\aust_\YoRiS\QLFS\QLF8.txt'
 dataQLF = np.genfromtxt(file, dtype=float)
-PhikinFRII, Phikin, Phikin21conv, PhikinFRII21, kin, kkin, Phir21, Phirg21 = KLF_FRI_FRII(Lrr, Rx_values, zz, LR, FRIfracX[0], FRIIfracX[0])
+PhikinFRII, Phikin, Phikin21conv, PhikinFRII21, kin, kkin, Phir21, Phirg21, Phikinscatter, Phikinscatter2, PhikinFRIIscatter, PhikinFRIIscatter2 = KLF_FRI_FRII(Lrr, zz, LR)
 # Extract necessary data columns
 mi2_column = dataQLF[:, 0]
 PhiMi = dataQLF[:, 1]
@@ -58,7 +58,7 @@ kx=Lbol-Lxx
 kxx=np.interp(Lx,Lxx,kx)
 Lboll=kxx+Lx
 Phixbol20=Phi_20*np.abs(np.gradient(Lxx,Lx)) #just absorbtion of NH <21
-Phixbol20frac = Phixbol20*FRIIfracX[1] #log for comparison and account for fraction of FRI/FRII radio sources in the sample
+Phixbol20frac = Phixbol20*FRIfracX[7] #log for comparison and account for fraction of FRI/FRII radio sources in the sample
 
 #print(np.abs(np.gradient(Lboll,Lx)))
 #converting the QLF into the B-band bolometric luminosity
@@ -72,9 +72,9 @@ Lboloptdata=kbb+LBdata
 PhiB=(10**Phi_l_2500)*np.abs(np.gradient(LBdata,l_2500))
 PhiBd=(10**Phi_l_2500l)*np.abs(np.gradient(LBdata,l_2500))
 PhiBu=(10**Phi_l_2500u)*np.abs(np.gradient(LBdata,l_2500))
-PhiBbol=PhiB*np.abs(np.gradient(Lboloptdata,LBdata))*((FRIIfracopt[1])) #account for the fraction of sources in the optical sample
-PhiBbold=PhiBd*np.abs(np.gradient(Lboloptdata,LBdata))*FRIIfracopt[1]
-PhiBbolu=PhiBu*np.abs(np.gradient(Lboloptdata,LBdata))*FRIIfracopt[1]
+PhiBbol=PhiB*np.abs(np.gradient(Lboloptdata,LBdata))*((FRIfracopt[7])) #account for the fraction of sources in the optical sample
+PhiBbold=PhiBd*np.abs(np.gradient(Lboloptdata,LBdata))*FRIfracopt[7]
+PhiBbolu=PhiBu*np.abs(np.gradient(Lboloptdata,LBdata))*FRIfracopt[7]
 sigmaBbold= (np.log10(PhiBbol) - np.log10(PhiBbold))
 sigmaBbolu= (np.log10(PhiBbolu) - np.log10(PhiBbol))
 
@@ -82,7 +82,7 @@ for i, L in enumerate(Lboldiscrete):
     Lbolgk = gkFRI(L)
     ax = axes[i]
     if __name__ == "__main__":
-        ax.plot(Lbolgk, np.log10(PhikinFRII21), color='black', linestyle='-', label='NH<21')
+        ax.plot(Lbolgk, np.log10(Phikin21conv), color='black', linestyle='-', label='NH<21')
         ax.scatter(Lboloptdata, np.log10(PhiBbol), marker='o', color='navy', s=30, edgecolors='black', label=f'QLF sample at matched at L = {L}')
         for xi, yi, y_err_lower_i, y_err_upper_i in zip(Lboloptdata, np.log10(PhiBbol), sigmaBbold, sigmaBbolu):
             ax.errorbar(xi, yi, yerr=[[y_err_lower_i], [y_err_upper_i]], fmt='none', capsize=3, color='navy')
@@ -97,7 +97,7 @@ for i, L in enumerate(Lboldiscrete):
         ax.set_xticklabels(tick_labels)
         ax.set_ylim(-10.5, -3.5)
         ax.set_xlim(43, 48.5)
-        ax.legend(loc='lower left', fontsize=14, fancybox = True, framealpha = 0.0)
+        ax.legend(loc='upper left', fontsize=14, fancybox = True, framealpha = 0.0)
         ax.grid(True)
         
 if __name__ == "__main__": 

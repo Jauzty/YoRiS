@@ -17,7 +17,7 @@ file_list += glob.glob(r'C:\Users\aust_\YoRiS\*WangSmolcic.txt')
 file_list.sort()
 
 if __name__ == "__main__":
-    fig, axes = plt.subplots(3, 3, figsize=(24, 18), sharex=True, sharey=True)
+    fig, axes = plt.subplots(3, 3, figsize=(32, 22), sharex=True, sharey=True)
 
     for i, file_name in enumerate(file_list):
         if "0.15de jong" in file_name:
@@ -42,15 +42,15 @@ if __name__ == "__main__":
         lrmin = 30 #erg/s
         lrmax = 47
         Lr_values = np.linspace(lrmin, lrmax, 1000)
-        Rx_values = np.linspace(-10, -1, 1000)
-        Rx_values1 = Lr_values - 44
+        Rx_values = np.linspace(-10, -1, 1000) #FRI
+        Rx_values1 = Lr_values - 44 #FRII
         P = Lr_values-7-np.log10(1.4)-9
         Phir, Phirgausfake = fradioFRII(z, Rx_values, Lr_values, 41)
         Phirfake, Phirgaus = fradioFRII(z, Rx_values1, Lr_values, 41)
         Phirtot = Phir + Phirgaus
         
         if "WangSmolcic" in file_name:
-            data = np.genfromtxt(file_name, dtype=float, usecols=(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11))
+            data = np.genfromtxt(file_name, dtype=float, usecols=(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15))
             densFRI = np.log10(data[:, 1])
             Lum = data[:, 0]
             FRIerrpos = np.log10(data[:, 3])-densFRI
@@ -63,6 +63,10 @@ if __name__ == "__main__":
             LumC = data[:, 8]
             FRIerrposC = np.log10(data[:, 11])-densFRIC
             FRIerrnegC = densFRIC-np.log10(data[:, 10])
+            densFRISlaus = np.log10(data[:, 13])
+            LumSlaus = data[:, 12]
+            FRIerrposSlaus = np.log10(data[:, 15])-densFRISlaus
+            FRIerrnegSlaus = densFRISlaus-np.log10(data[:, 14])
         else:
             data = np.genfromtxt(file_name, dtype=float, usecols=(0, 1, 2, 3, 4, 5, 6))
             densFRI = data[:, 1]
@@ -81,11 +85,10 @@ if __name__ == "__main__":
             ax.errorbar(Lum, densFRI, yerr=[FRIerrpos, FRIerrneg], fmt='d', label=f'Wang+2024, z={z}', alpha = 0.5, color = 'red', capsize = 4, markersize = 10)
             ax.errorbar(LumS, densFRIS,  yerr=[FRIerrposS, FRIerrnegS], fmt='d', label=f'Smolcic+2017, z={z}', alpha = 0.5, color = 'green', capsize = 4, markersize = 10)
             ax.errorbar(LumC, densFRIC,  yerr=[FRIerrposC, FRIerrnegC], fmt='s', label=f'Ceraj+2018, z={z}', alpha = 0.5, color = 'purple', capsize = 4, markersize = 10)
+            ax.errorbar(LumSlaus, densFRISlaus,  yerr=[FRIerrposSlaus, FRIerrnegSlaus], fmt='o', label=f'Slaus+2023 V_max, z={z}', alpha = 0.5, color = 'navy', capsize = 4, markersize = 10)
         else:
-            # Plotting FRI without additional log scale transformation
+
             ax.errorbar(Lum, densFRI, yerr=[FRIerrpos, -FRIerrneg], fmt='d', label=f'DeJong+2023FRI, z={z}', alpha = 0.5, color = 'red', capsize = 4, markersize = 10)
-    
-            # Plotting FRII without additional log scale transformation
             ax.errorbar(Lum, densFRII, yerr=[FRIIerrpos, -FRIIerrneg], fmt='o', label=f'DeJong+2023FRII, z={z}', alpha = 0.5, color = 'green', capsize = 4, markersize = 10)
             ax.plot(P, np.log10(Phir), label = f'FRI RLF z = {z}')
             ax.plot(P, np.log10(Phirtot), label = f'FRII RLF z = {z}')
@@ -100,9 +103,9 @@ if __name__ == "__main__":
         ax.grid(True)
 
     plt.tight_layout()
-    plt.rcParams['font.size'] = 21
+    plt.rcParams['font.size'] = 24
     plt.rcParams['font.family'] = 'serif'
-    plt.rcParams['figure.dpi'] = 300
+    plt.rcParams['figure.dpi'] = 500
     plt.subplots_adjust(wspace=0.0, hspace=0.0)
     plt.show()
 

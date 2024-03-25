@@ -42,17 +42,19 @@ def gkFRI(z):
     #gknew =[0.1, 0.085, 0.065, 0.05, 0.053, 0.037, 0.025, 0.0265, 0.03, 0.022, 0.05] #matched for high luminosity
     #gknew =[0.082, 0.075, 0.045, 0.03, 0.035, 0.023, 0.012, 0.02, 0.025, 0.003, 0.006] #matched for low luminosity case 2
     #gknew =[0.1, 0.08, 0.047, 0.03, 0.035, 0.023, 0.012, 0.02, 0.025, 0.003, 0.006] #matched for low luminosity case 4
-    #gknew =[0.065, 0.055, 0.035, 0.025, 0.02, 0.015, 0.015, 0.015, 0.02, 0.02, 0.03] #new conv high L no scatter
-    gknew = [0.34, 0.16, 0.11, 0.1, 0.09, 0.08, 0.07, 0.05, 0.05, 0.045, 0.085] #new conv, high L, 0.25 scatter
+    #gknew =[0.15, 0.13, 0.1, 0.09, 0.07, 0.05, 0.04, 0.07, 0.07, 0.07, 0.12] #new conv, L=46, no scatter, unchecked
+    #gknew = [0.25, 0.18, 0.1, 0.08, 0.08, 0.065, 0.055, 0.08, 0.075, 0.075, 0.18] #new conv, L=46, 0.25 scatter
+    #gknew = [0.49, 0.37, 0.22, 0.14, 0.13, 0.1, 0.09, 0.15, 0.15, 0.15, 0.3] #new conv, L=46, 0.47 scatter
+    gknew = [0.1504, 0.1459, 0.0926, 0.058, 0.0577, 0.0521, 0.0387, 0.0492, 0.0439, 0.0431, 0.0582] #mcmc
     tt = np.where(np.array(red) == z)
     if len(tt[0]) > 0:
         index = tt[0][0]  # Get the first matching index
-        gk = gkinI[index]
-        gk_03 = gkinI_03[index]
-        gk_conv = gkinI_conv[index]
-        gk22 = gkin22I[index]
-        gk22_03 = gkin22I_03[index]
-        gk22_conv = gkin22I_conv[index]
+        #gk = gkinI[index]
+        #gk_03 = gkinI_03[index]
+        #gk_conv = gkinI_conv[index]
+        #gk22 = gkin22I[index]
+        #gk22_03 = gkin22I_03[index]
+        #gk22_conv = gkin22I_conv[index]
         newgk = gknew[index]
     
     nk = len(kin)
@@ -66,12 +68,12 @@ def gkFRI(z):
     
     # gkin for FRI, comparison in the bolometric plane
     for io in range(nk):
-        LgLbol[io] = -np.log10(gk) + kin[io]
-        LgLbol_03[io] = -np.log10(gk_03) + kin[io]
-        LgLbol_conv[io] = -np.log10(gk_conv) + kin[io]
-        LgLbol22[io] = -np.log10(gk22) + kin[io]
-        LgLbol22_03[io] = -np.log10(gk22_03) + kin[io]
-        LgLbol22_conv[io] = -np.log10(gk22_conv) + kin[io]
+        #LgLbol[io] = -np.log10(gk) + kin[io]
+        #LgLbol_03[io] = -np.log10(gk_03) + kin[io]
+        #LgLbol_conv[io] = -np.log10(gk_conv) + kin[io]
+        #LgLbol22[io] = -np.log10(gk22) + kin[io]
+        #LgLbol22_03[io] = -np.log10(gk22_03) + kin[io]
+        #LgLbol22_conv[io] = -np.log10(gk22_conv) + kin[io]
         LgLbolnew[io] = -np.log10(newgk) + kin[io]
     #print(gk)
     #print(f' Lboll/Lglbol is {min(Lboll/LgLbol)}, {max(Lboll/LgLbol)}') 
@@ -81,7 +83,7 @@ def gkFRI(z):
     
 def gkFRII(z):
     
-    redII=[0.5, 0.9, 1.2, 1.6, 2.0, 2.4, 2.8, 3.2]
+    redII=[0.5, 0.9, 1.2, 1.6, 2.0, 2.4, 2.8, 3.2, 3.8, 4.2, 4.8]
     gkIIup_conv=[3.5, 1.1, 1., 1., 1.,1., 1.1]
     gkIIup=[3.5, 1.1, 0.8, 1., 1., 1., 1.1]
     gkII21=[0.4, 0.45, 0.5, 0.5, 0.5, 0.55, 0.45,0.45]
@@ -93,9 +95,9 @@ def gkFRII(z):
     gtest=[0.85, 0.9, 0.95, 1.0, 1.0, 1.0,1.0, 1.]
     gkIIl=[0.1, 0.1, 0.08, 0.07, 0.07, 0.07, 0.08]
     #gknew = [0.9, 0.9, 0.9, 1, 0.7, 0.6, 0.6, 0.6]# match at low luminosity 
-    gknew = [0.8, 0.7, 0.7, 0.65, 0.55, 0.5, 0.5, 0.5]# match at mid luminosity
+    #gknew = [0.8, 0.7, 0.7, 0.65, 0.55, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]# match at mid luminosity
     #gknew = [0.7, 0.55, 0.51, 0.42, 0.33, 0.35, 0.33, 0.3]# match at high luminosity
-    
+    gknew = [0.64, 0.68, 0.42, 0.45, 0.40, 0.45, 0.44, 0.39, 0.29, 0.41, 0.28] #mcmc
     
     tt = np.where(np.array(redII) == z)
     if len(tt[0]) > 0:

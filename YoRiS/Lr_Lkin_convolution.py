@@ -59,7 +59,7 @@ def KLF_FRI_FRII(Lrr, z, LR):
     kin = alpha * (L5r) + beta   
     # Calculate kinetic luminosity kkin
     kkin = aa * (LR - 25) + bb + 7.0  # kkin is in erg/s
-    kkin2017 = 0.87 * (LR-25) + 36.05 + 7#erg/s 1.4ghz ineson
+    kkin2017 = 0.89 * (LR-25) + 36.05 + 7#erg/s 1.4ghz ineson
     kkin2013 = 0.9 * (LR-25) +35.12 + np.log10(1+z) + 0.58*np.log10(100) + 7 # S and G contains dependance on source size
     kkin2011 = 0.63 * (LR-25) + 37.76 + 7 # o'sullivan erg/s at 1.4ghz
     kkin1999 = 0.86 * (LR-25) + 37.37 + np.log10(15/15) + 7 # o'sullivan erg/s at 1.4ghz
@@ -76,7 +76,7 @@ def KLF_FRI_FRII(Lrr, z, LR):
     temp = np.zeros(nr)
     temp1 = np.zeros(nr)
     Rx_values1 = Lr_values - 44 #correct way to calculate Rx works for FRII but not FRI
-    Rx_values = Lr_values - np.linspace(41, 49, 1000)
+    Rx_values = np.linspace(-10, -1, 1000) #FRI
 
     for s in range(nr):
         temp = Lr_values[s] - Rx_values
@@ -109,10 +109,10 @@ def KLF_FRI_FRII(Lrr, z, LR):
 
     Phir21 = Phir21
     Phirg21 = Phirg21
-    Phikin21conv = convolve(Phir21, LR, kin, kin, 0.25)
-    Phikin = convolve(Phir, LR, kin, kin, 0.25)
-    Phikinscatter = convolve(Phir21, LR, kin, kin, 0.47)
-    Phikinscatter2 = convolve(Phir21, LR, kin, kin, 0.7)
+    Phikin21conv = convolve(Phir21, LR, kin, kin, 0.01)
+    Phikin = convolve(Phir, LR, kin, kin, 0.01)
+    Phikinscatter = convolve(Phir21, LR, kin, kin, 0.25)
+    Phikinscatter2 = convolve(Phir21, LR, kin, kin, 0.47)
     PhikinFRII = convolve(Phirgaus, LR, kkin, kkin, 0.01)
     PhikinFRIIscatter = convolve(Phirg21, LR, kkin, kkin, 0.25)
     PhikinFRIIscatter2 = convolve(Phirg21, LR, kkin, kkin, 0.7)
@@ -154,7 +154,7 @@ def KLF_FRI_FRII(Lrr, z, LR):
         plt.show()
     return PhikinFRII, Phikin, Phikin21conv, PhikinFRII21, kin, kkin, Phir21, Phirg21, Phikinscatter, Phikinscatter2, PhikinFRIIscatter, PhikinFRIIscatter2
 
-Rx_values = np.linspace(-10, -1, 1000)  # Rx range calculating with LR+(7+np.log10(1.4)+9) -44 does not work idk why
+Rx_values = np.linspace(-10, -1, 1000)  # Rx range taken from federica for FRI
 #z_values = [1, 2, 3, 4, 5]
 z = 1  # Redshift value
 Lmin = 41  # Minimum luminosity
