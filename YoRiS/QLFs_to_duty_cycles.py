@@ -112,7 +112,7 @@ def myBolfunc(TAG, L):
         L_qq = 0.0
         return L_B
     
-    elif TAG == 3:
+    elif TAG == 3: #should really be in reverse func because input is x ray not lbol
         #Duras+2020 hard x ray bolometric correction as a function of the bolometric luminosity
         a = 10.96 # +- 0.06
         b = 11.93 # +- 0.01
@@ -121,7 +121,7 @@ def myBolfunc(TAG, L):
         L_C= L_1 + 33 + np.log10(4)
         return L_C # scatter is 0.27
     
-    elif TAG == 4: 
+    elif TAG == 4: #same here
         #Duras+2020 hard x ray bolometric correction as a function of the hard x ray luminosity
         a = 15.33 # +- 0.06
         b = 11.48 # +- 0.01
@@ -417,6 +417,7 @@ def dutySDSSshen(Lunif, l_2500, PhiBbol, Lboloptdata, sigmaBbold, sigmaBbolu, LB
         
     return PhiradioII
 
+
 #equivalent to compxopt 
 file_list = glob.glob(r'C:\Users\aust_\YoRiS\QLFS\QLF*.txt')
 file_list.sort()
@@ -479,8 +480,8 @@ for i, file_name in enumerate(file_list): #take the qlf files and separate them 
     Phi_24 = Ueda_14(Lx, z, 4) + Phi_23 #upto nh<26 (CTK)
     
     #converting the XLF into bolometric using K-correction
-    Lxx=myBolfunc(1,Lbol)
-    kx=Lbol-Lxx
+    Lxx=myBolfunc(1,Lx)
+    kx=Lx-Lxx
     kxx=np.interp(Lx,Lxx,kx)
     Lboll=kxx+Lx
     Phixbol20=Phi_20*np.abs(np.gradient(Lxx,Lx)) #just absorbtion of NH <21
@@ -489,17 +490,17 @@ for i, file_name in enumerate(file_list): #take the qlf files and separate them 
     Phixbol23=Phi_23*np.abs(np.gradient(Lxx,Lx))
     Phixbol24=Phi_24*np.abs(np.gradient(Lxx,Lx)) #sum of all absorbtions
     
-    Phixbol20frac = Phixbol20*FRIfracX[i] #log for comparison and account for fraction of FRI/FRII radio sources in the sample
-    Phixbol21frac = Phixbol21*FRIfracX[i]
-    Phixbol22frac = Phixbol22*FRIfracX[i]
-    Phixbol23frac = Phixbol23*FRIfracX[i]
-    Phixbol24frac = Phixbol24*FRIfracX[i]
+    Phixbol20frac = Phixbol20*FracALLX[i] #log for comparison and account for fraction of FRI/FRII radio sources in the sample
+    Phixbol21frac = Phixbol21*FracALLX[i]
+    Phixbol22frac = Phixbol22*FracALLX[i]
+    Phixbol23frac = Phixbol23*FracALLX[i]
+    Phixbol24frac = Phixbol24*FracALLX[i]
     
     #print(np.abs(np.gradient(Lboll,Lx)))
     #converting the QLF into the B-band bolometric luminosity
     alpha_opt = 0.5
-    LB=myBolfunc(2,Lbol)
-    kb=Lbol-LB
+    LB=myBolfunc(2,l_kev)
+    kb=l_kev-LB
     LBdata=l_2500+alpha_opt*np.log10(6.7369/11.992) #use spectral index to convert to bolometric
     LBdata=LBdata + 14 + np.log10(6.7369)
     kbb=np.interp(LBdata,LB,kb)
@@ -507,11 +508,18 @@ for i, file_name in enumerate(file_list): #take the qlf files and separate them 
     PhiB=(10**Phi_l_2500)*np.abs(np.gradient(LBdata,l_2500))
     PhiBd=(10**Phi_l_2500l)*np.abs(np.gradient(LBdata,l_2500))
     PhiBu=(10**Phi_l_2500u)*np.abs(np.gradient(LBdata,l_2500))
-    PhiBbol=PhiB*np.abs(np.gradient(Lboloptdata,LBdata))*((FRIfracopt[i])) #account for the fraction of sources in the optical sample
-    PhiBbold=PhiBd*np.abs(np.gradient(Lboloptdata,LBdata))*FRIfracopt[i]
-    PhiBbolu=PhiBu*np.abs(np.gradient(Lboloptdata,LBdata))*FRIfracopt[i]
-    sigmaBbold= (np.log10(PhiBbol) - np.log10(PhiBbold))
-    sigmaBbolu= (np.log10(PhiBbolu) - np.log10(PhiBbol))
+    PhiBbol=PhiB*np.abs(np.gradient(Lboloptdata,LBdata))*((Fracallopt[i])) #account for the fraction of sources in the optical sample
+    PhiBbold=PhiBd*np.abs(np.gradient(Lboloptdata,LBdata))*Fracallopt[i]
+    PhiBbolu=PhiBu*np.abs(np.gradient(Lboloptdata,LBdata))*Fracallopt[i]
+    sigmaBbold= PhiBbol - PhiBbold
+    sigmaBbolu= PhiBbolu - PhiBbol
+    logPhi = np.log10(PhiBbol)
+    log_phi_pos_err = np.abs(sigmaBbolu / (PhiBbol * np.log(10)))
+    log_phi_neg_err = np.abs(sigmaBbold / (PhiBbol * np.log(10)))
+    log_phi_pos_err = np.where(np.isnan(log_phi_pos_err), np.nanmean(log_phi_pos_err), log_phi_pos_err)
+    log_phi_pos_err = np.where(log_phi_pos_err == 0, np.nanmean(log_phi_pos_err), log_phi_pos_err)
+    log_phi_neg_err = np.where(np.isnan(log_phi_neg_err), np.nanmean(log_phi_neg_err), log_phi_neg_err)
+    log_phi_neg_err = np.where(log_phi_neg_err == 0, np.nanmean(log_phi_neg_err), log_phi_neg_err)
 
     if __name__ == "__main__":
         ax = axes[i]
@@ -519,18 +527,18 @@ for i, file_name in enumerate(file_list): #take the qlf files and separate them 
         ax.plot(Lboll, np.log10(Phixbol21frac), color='red', linestyle='--', label='NH<22')
         ax.plot(Lboll, np.log10(Phixbol22frac), color='purple', linestyle='-.', label='NH<23')
         ax.plot(Lboll, np.log10(Phixbol23frac), color='green', linestyle=':', label='NH<24')
-        ax.plot(Lboll, np.log10(Phixbol24frac), color='orange', linestyle=(0, (2, 1)), label='BLF at NH<26')
-        ax.scatter(Lboloptdata, np.log10(PhiBbol), marker='o', color='navy', s=30, edgecolors='black', label=f'QLF sample at z = {z}')
-        for xi, yi, y_err_lower_i, y_err_upper_i in zip(Lboloptdata, np.log10(PhiBbol), sigmaBbold, sigmaBbolu):
-            ax.errorbar(xi, yi, yerr=[[y_err_lower_i], [y_err_upper_i]], fmt='none', capsize=3, color='navy')
+        ax.plot(Lboll, np.log10(Phixbol24frac), color='orange', linestyle=(0, (2, 1)), label='NH<26')
+        ax.scatter(Lboloptdata, np.log10(PhiBbol), marker='o', color='navy', s=30, edgecolors='black', label=f'QSO LFs at z = {z}')
+        for xi, yi, y_err_lower_i, y_err_upper_i in zip(Lboloptdata, np.log10(PhiBbol), log_phi_neg_err, log_phi_pos_err):
+            ax.errorbar(xi, yi, yerr=[[y_err_lower_i], [y_err_upper_i]], fmt='none', capsize=5, color='navy')
         # sets the axes labels correctly, 3 on the y and 4 on the x axis
         if i // 4 == 2:
             ax.set_xlabel('$\log L_{bol} [erg s^{-1}]$')
         if i % 4 == 0:
-            ax.set_ylabel('$\log \Phi(L_{k}) [Mpc^{-3} dex^{-1}]$')
-        ax.set_ylim(-10.5, -3.5)
-        ax.set_xlim(43, 48.5)
-        ax.legend(loc='lower left', fontsize=14, fancybox = True, framealpha = 0.0)
+            ax.set_ylabel('$\log \Phi(L_{bol}) [Mpc^{-3} dex^{-1}]$')
+        ax.set_ylim(-11.5, -3.5)
+        ax.set_xlim(44, 48.5)
+        ax.legend(loc='lower left', fontsize=16, fancybox = True, framealpha = 0.0)
         ax.grid(True)
 
 if __name__ == "__main__":    
@@ -540,5 +548,5 @@ if __name__ == "__main__":
     plt.tight_layout()
     plt.subplots_adjust(wspace=0.0, hspace=0.0)
     plt.show()
-if __name__  == "__main__":
-    dutySDSSshen(Lunif, l_2500, PhiBbol, Lboloptdata, sigmaBbold, sigmaBbolu, LBdata)
+#if __name__  == "__main__":
+    #dutySDSSshen(Lunif, l_2500, PhiBbol, Lboloptdata, sigmaBbold, sigmaBbolu, LBdata)

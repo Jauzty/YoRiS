@@ -54,7 +54,7 @@ if __name__ == "__main__":
             densFRI = np.log10(data[:, 1])
             Lum = data[:, 0]
             FRIerrpos = np.log10(data[:, 3])-densFRI
-            FRIerrneg = densFRI-np.log10(data[:, 2])
+            FRIerrneg = np.abs(densFRI-np.log10(data[:, 2]))
             densFRIS = np.log10(data[:, 5])
             LumS = data[:, 4]
             FRIerrposS = np.log10(data[:, 7])-densFRIS
@@ -80,30 +80,32 @@ if __name__ == "__main__":
 
         ax = axes.flatten()[i]
         if "WangSmolcic" in file_name:
-            ax.plot(P, np.log10(Phir), label = f'FRI RLF z = {z}')
-            ax.plot(P, np.log10(Phirtot), label = f'FRII RLF z = {z}')
-            ax.errorbar(Lum, densFRI, yerr=[FRIerrpos, FRIerrneg], fmt='d', label=f'Wang+2024, z={z}', alpha = 0.5, color = 'red', capsize = 4, markersize = 10)
-            ax.errorbar(LumS, densFRIS,  yerr=[FRIerrposS, FRIerrnegS], fmt='d', label=f'Smolcic+2017, z={z}', alpha = 0.5, color = 'green', capsize = 4, markersize = 10)
-            ax.errorbar(LumC, densFRIC,  yerr=[FRIerrposC, FRIerrnegC], fmt='s', label=f'Ceraj+2018, z={z}', alpha = 0.5, color = 'purple', capsize = 4, markersize = 10)
-            ax.errorbar(LumSlaus, densFRISlaus,  yerr=[FRIerrposSlaus, FRIerrnegSlaus], fmt='o', label=f'Slaus+2023 V_max, z={z}', alpha = 0.5, color = 'navy', capsize = 4, markersize = 10)
+            ax.plot(P, np.log10(Phir), label = f'FRI RLF z = {z}', linestyle = "--", color = "black")
+            ax.plot(P, np.log10(Phirtot), label = f'FRII RLF z = {z}', color = "blue")
+            ax.errorbar(Lum, densFRI, yerr=[FRIerrpos, FRIerrneg], fmt='d', label=f'Wang+2024, z={z}', alpha = 0.5, color = 'red', capsize = 4, markersize = 13)
+            ax.errorbar(LumS, densFRIS,  yerr=[FRIerrposS, FRIerrnegS], fmt='X', label=f'Smolcic+2017, z={z}', alpha = 0.5, color = 'green', capsize = 4, markersize = 13)
+            ax.errorbar(LumC, densFRIC,  yerr=[FRIerrposC, FRIerrnegC], fmt='s', label=f'Ceraj+2018, z={z}', alpha = 0.5, color = 'purple', capsize = 4, markersize = 13)
+            ax.errorbar(LumSlaus, densFRISlaus,  yerr=[FRIerrposSlaus, FRIerrnegSlaus], fmt='o', label=f'Slaus+2023, z={z}', alpha = 0.5, color = 'navy', capsize = 4, markersize = 13)
         else:
 
-            ax.errorbar(Lum, densFRI, yerr=[FRIerrpos, -FRIerrneg], fmt='d', label=f'DeJong+2023FRI, z={z}', alpha = 0.5, color = 'red', capsize = 4, markersize = 10)
-            ax.errorbar(Lum, densFRII, yerr=[FRIIerrpos, -FRIIerrneg], fmt='o', label=f'DeJong+2023FRII, z={z}', alpha = 0.5, color = 'green', capsize = 4, markersize = 10)
-            ax.plot(P, np.log10(Phir), label = f'FRI RLF z = {z}')
-            ax.plot(P, np.log10(Phirtot), label = f'FRII RLF z = {z}')
+            ax.errorbar(Lum, densFRI, yerr=[FRIerrpos, -FRIerrneg], fmt='d', label=f'DeJong+2023 FRI, z={z}', alpha = 0.5, color = 'red', capsize = 4, markersize = 13)
+            ax.errorbar(Lum, densFRII, yerr=[FRIIerrpos, -FRIIerrneg], fmt='o', label=f'DeJong+2023 FRII, z={z}', alpha = 0.5, color = 'green', capsize = 4, markersize = 13)
+            ax.plot(P, np.log10(Phir), label = f'FRI RLF z = {z}', linestyle = "--", color = "black")
+            ax.plot(P, np.log10(Phirtot), label = f'FRII RLF z = {z}', color = "blue")
         
         if i == 6  or i == 7 or i == 8:
-            ax.set_xlabel('$\log (L_{R}) (erg/s)$')
+            ax.set_xlabel('$\log (L_{R}) (W/Hz^{-1})$')
         if i == 0 or i == 3 or i == 6:
-            ax.set_ylabel('$\log \Phi(L_{k}) [Mpc^{-3} dex^{-1}]$')
+            ax.set_ylabel('$\log \Phi(L_{R}) [Mpc^{-3} dex^{-1}]$')
         ax.set_ylim(-9.5, -2.5)
-        ax.set_xlim(16, 30)
-        ax.legend()
+        ax.set_xlim(16, 29)
+        ax.set_xticks(range(18, 29, 2))
+        ax.set_yticks(range(-9, -2, 1))
+        ax.legend(prop = {"size": 25}, framealpha = 0.0)
         ax.grid(True)
 
     plt.tight_layout()
-    plt.rcParams['font.size'] = 24
+    plt.rcParams['font.size'] = 40
     plt.rcParams['font.family'] = 'serif'
     plt.rcParams['figure.dpi'] = 500
     plt.subplots_adjust(wspace=0.0, hspace=0.0)

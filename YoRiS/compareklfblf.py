@@ -12,11 +12,19 @@ import matplotlib.pyplot as plt
 from QLFs_to_duty_cycles import mi_to_L2500, L2500_to_kev, myBolfunc
 from Lr_Lkin_convolution import KLF_FRI_FRII, LR, Rx_values, Lrr
 from gk import gkFRI, gkFRII
-from sklearn.model_selection import cross_val_score
-from sklearn.preprocessing import PolynomialFeatures
-from sklearn.linear_model import LinearRegression
-from sklearn.pipeline import make_pipeline
-from scipy.interpolate import interp1d
+from scipy.integrate import simps
+
+def convolve(f, y, xmed, x, sigma):
+    """written to match the convolution function in IDL as the numpy one is not the same, 
+    it previously caused some issues"""
+    nx = len(x)
+    res = np.zeros(nx, dtype=float)
+
+    for ix in range(nx):
+        k = np.exp(-((x[ix] - xmed)**2) / (2.0 * sigma**2)) / np.sqrt(2 * np.pi * sigma**2)
+        res[ix] = simps(f * k, y)
+
+    return res
 
 def find_crossing_points(y_values, threshold):
     # Find indices where y values cross the threshold
@@ -35,9 +43,10 @@ FRIfracX = [0.0754413, 0.0715513, 0.0629219, 0.0638171, 0.0527830, 0.0948788, 0.
 #FRII frac list
 FRIIfracX = [0.0308062, 0.0565392, 0.0465047, 0.0291714, 0.0165781, 0.0254845, 0.0162047, 0.0194296, 0.0030720, 0.0420260, 0.0217945, 0.0]
 
-zvalues = [0.5, 0.9, 1.2, 1.6, 2.0, 2.4, 2.8, 3.2, 3.8, 4.2, 4.8]
+zvalues = [0.5, 0.9, 1.2, 1.6, 2.0, 2.4, 2.8, 3.2]
 
 gknew = [0.49, 0.37, 0.22, 0.14, 0.13, 0.1, 0.09, 0.15, 0.15, 0.15, 0.3]
+
 
 file_list = glob.glob(r'C:\Users\aust_\YoRiS\QLFS\QLF*.txt')
 file_list.sort()
@@ -48,7 +57,7 @@ Lbol = np.linspace(40, 50, 1000)
 optimized_LgLbol_list = []
 
 if __name__ == "__main__":
-    fig, axes = plt.subplots(3, 4, figsize=(22, 14), sharex = True, sharey = True)
+    fig, axes = plt.subplots(2, 4, figsize=(22, 10), sharex = True, sharey = True)
     axes = axes.flatten()
     
 best_gk =[]
@@ -85,8 +94,8 @@ for i, (zz, file_name) in enumerate(zip(zvalues, file_list)): #take the qlf file
     # Extract necessary data columns
     mi2_column = dataQLF[:, 0]
     PhiMi = dataQLF[:, 1]
-    PhiMiu = dataQLF[:, 3] #upper bound
-    PhiMil = dataQLF[:, 2] #lower bound
+    PhiMiu = dataQLF[:, 2] #upper bound
+    PhiMil = dataQLF[:, 3] #lower bound
 
     # Call the mi_to_L2500 function to convert magnitudes to L2500 Ångström luminosities
     l_2500, Phi_l_2500 = mi_to_L2500(mi2_column, PhiMi)
@@ -117,30 +126,24 @@ for i, (zz, file_name) in enumerate(zip(zvalues, file_list)): #take the qlf file
     sigmaBbolu= PhiBbolu - PhiBbol
     logPhi = np.log10(PhiBbol)
     log_phi_pos_err = np.abs(sigmaBbolu / (PhiBbol * np.log(10)))
-    log_phi_neg_err = np.abs(sigmaBbold / (PhiBbol * np.log(10))) 
+    log_phi_neg_err = np.abs(sigmaBbold / (PhiBbol * np.log(10)))
+    log_phi_pos_err = np.where(np.isnan(log_phi_pos_err), np.nanmean(log_phi_pos_err), log_phi_pos_err)
+    log_phi_pos_err = np.where(log_phi_pos_err == 0, np.nanmean(log_phi_pos_err), log_phi_pos_err)
+    log_phi_neg_err = np.where(np.isnan(log_phi_neg_err), np.nanmean(log_phi_neg_err), log_phi_neg_err)
+    log_phi_neg_err = np.where(log_phi_neg_err == 0, np.nanmean(log_phi_neg_err), log_phi_neg_err)
     LgLbol = gkFRI(zz)    
     Lbolfrii = gkFRII(zz)
-    print(LB)
-    
-    
-    cut_index = find_crossing_points(PhikinFRII21, 1e-10)
-    midpoint = (Lbolfrii[cut_index[:-1]] + Lbolfrii[cut_index[1:]]) / 2.01
-    
-    #midpoint = np.max(Lbolfrii) - ((np.max(Lbolfrii)-np.min(Lbolfrii)) // 2)
-    cut_point = np.argmax(Lbolfrii >= midpoint)
-    right_half_phi = PhikinFRII21[cut_point:]
-    right_half_lum = Lbolfrii[cut_point:]
     
     if __name__ == "__main__":
         ax = axes[i]
-        ax.plot(Lbolfrii, np.log10(PhikinFRII21), color='black', linestyle='-', label='no scatter')
+        ax.plot(Lbolfrii, np.log10(PhikinFRII21), color='orange', linestyle='-', label='no scatter')
         #ax.axvline(x=right_half_lum[0], color='r', linestyle='--', label='Cut Point')
-        ax.plot(Lbolfrii, np.log10(PhikinFRIIscatter), color='black', linestyle='--', label='0.25 scatter')
-        ax.plot(Lbolfrii, np.log10(PhikinFRIIscatter2), color='black', linestyle=':', label='0.47 scatter')
-        ax.scatter(Lboloptdata, np.log10(PhiBbol), marker='o', color='navy', s=30, edgecolors='black', label=f'QLF sample at z = {z}')
+        ax.plot(Lbolfrii, np.log10(PhikinFRIIscatter), color='purple', linestyle='--', label='0.25 scatter')
+        ax.plot(Lbolfrii-0.5, np.log10(PhikinFRIIscatter2), color='red', linestyle=':', label='0.7 scatter')
+        ax.scatter(Lboloptdata, np.log10(PhiBbol), marker='o', color='navy', s=30, edgecolors='black', label=f'QSO LFs at z = {z}')
         for xi, yi, y_err_lower_i, y_err_upper_i in zip(Lboloptdata, np.log10(PhiBbol), log_phi_neg_err, log_phi_pos_err):
-            ax.errorbar(xi, yi, yerr=[[y_err_lower_i], [y_err_upper_i]], fmt='none', capsize=3, color='navy')
-            
+            ax.errorbar(xi, yi, yerr=[[y_err_lower_i], [y_err_upper_i]], fmt='none', capsize=5, color='navy')
+        """
         # Cross-validation to choose the degree of the polynomial
         degrees = np.arange(1, 10)  # Adjust the range of degrees to consider
         scores = []
@@ -163,23 +166,23 @@ for i, (zz, file_name) in enumerate(zip(zvalues, file_list)): #take the qlf file
         fitted_curve_y = model.predict(fitted_curve_x.reshape(-1, 1))
 
         # Plotting the fitted curve
-        ax.plot(fitted_curve_x, fitted_curve_y, color='red', label=f'Curve Fit (Degree {best_degree})')
+        ax.plot(fitted_curve_x, fitted_curve_y, color='red', label=f'Curve Fit (Degree {best_degree})')"""
 
         # sets the axes labels correctly, 3 on the y and 4 on the x axis
-        if i // 4 == 2:
+        if i > 3:
             ax.set_xlabel('$\log L_{bol} [erg s^{-1}]$')
         if i % 4 == 0:
             ax.set_ylabel('$\log \Phi(L_{k}) [Mpc^{-3} dex^{-1}]$')
-        ax.set_ylim(-10.5, -3.5)
+        ax.set_ylim(-11.5, -3.5)
         ax.set_xlim(43, 48.5)
-        ax.legend(loc='lower left', fontsize=14, fancybox = True, framealpha = 0.0)
+        ax.legend(loc='lower left', fontsize=16, fancybox = True, framealpha = 0.0)
         ax.grid(True)
 
 if __name__ == "__main__": 
     print(best_gk)
-    plt.rcParams['font.size'] = 21
+    plt.rcParams['font.size'] = 24
     plt.rcParams['font.family'] = 'serif'
-    plt.rcParams['figure.dpi'] = 300
+    plt.rcParams['figure.dpi'] = 500
     plt.tight_layout()
     plt.subplots_adjust(wspace=0.0, hspace=0.0)
     plt.show()

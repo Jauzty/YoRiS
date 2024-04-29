@@ -156,7 +156,7 @@ def KLF_FRI_FRII(Lrr, z, LR):
 
 Rx_values = np.linspace(-10, -1, 1000)  # Rx range taken from federica for FRI
 #z_values = [1, 2, 3, 4, 5]
-z = 1  # Redshift value
+z = 0.1  # Redshift value
 Lmin = 41  # Minimum luminosity
 Lrr = np.linspace(30, 47, 1000) #erg/s at 5GHz
 LR = Lrr -7-np.log10(5)-9 #luminosity range in W/Hz 5 GHz based on federicas code

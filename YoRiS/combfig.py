@@ -3,17 +3,17 @@ from matplotlib.image import imread
 
 # File paths for the 11 figures
 file_paths = [
-    'C:\\Users\\aust_\\OneDrive\\Desktop\\figures\\fri1.png',
-    'C:\\Users\\aust_\\OneDrive\\Desktop\\figures\\fri2.png',
-    'C:\\Users\\aust_\\OneDrive\\Desktop\\figures\\fri3.png',
-    'C:\\Users\\aust_\\OneDrive\\Desktop\\figures\\fri4.png',
-    'C:\\Users\\aust_\\OneDrive\\Desktop\\figures\\fri5.png',
-    'C:\\Users\\aust_\\OneDrive\\Desktop\\figures\\fri6.png',
-    'C:\\Users\\aust_\\OneDrive\\Desktop\\figures\\fri7.png',
-    'C:\\Users\\aust_\\OneDrive\\Desktop\\figures\\fri8.png',
-    'C:\\Users\\aust_\\OneDrive\\Desktop\\figures\\fri9.png',
-    'C:\\Users\\aust_\\OneDrive\\Desktop\\figures\\fri10.png',
-    'C:\\Users\\aust_\\OneDrive\\Desktop\\figures\\fri11.png',
+    'C:\\Users\\aust_\\OneDrive\\Desktop\\figures\\FR1.png',
+    'C:\\Users\\aust_\\OneDrive\\Desktop\\figures\\FR2.png',
+    'C:\\Users\\aust_\\OneDrive\\Desktop\\figures\\FR3.png',
+    'C:\\Users\\aust_\\OneDrive\\Desktop\\figures\\FR4.png',
+    'C:\\Users\\aust_\\OneDrive\\Desktop\\figures\\FR5.png',
+    'C:\\Users\\aust_\\OneDrive\\Desktop\\figures\\FR6.png',
+    'C:\\Users\\aust_\\OneDrive\\Desktop\\figures\\FR7.png',
+    'C:\\Users\\aust_\\OneDrive\\Desktop\\figures\\FR8.png',
+    'C:\\Users\\aust_\\OneDrive\\Desktop\\figures\\FR9.png',
+    'C:\\Users\\aust_\\OneDrive\\Desktop\\figures\\FR10.png',
+    'C:\\Users\\aust_\\OneDrive\\Desktop\\figures\\FR11.png',
 ]
 
 # Create a 3x4 subplot grid (adjust rows and columns as needed)

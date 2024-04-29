@@ -102,13 +102,13 @@ for i, (zz, file_name) in enumerate(zip(zvalues, file_list)): #take the qlf file
     PhiB=(10**Phi_l_2500)*np.abs(np.gradient(LBdata,l_2500))
     PhiBd=(10**Phi_l_2500l)*np.abs(np.gradient(LBdata,l_2500))
     PhiBu=(10**Phi_l_2500u)*np.abs(np.gradient(LBdata,l_2500))
-    PhiBbol=PhiB*np.abs(np.gradient(Lboloptdata,LBdata))*((FRIfracopt[i])) #account for the fraction of sources in the optical sample
-    PhiBbold=PhiBd*np.abs(np.gradient(Lboloptdata,LBdata))*FRIfracopt[i]
-    PhiBbolu=PhiBu*np.abs(np.gradient(Lboloptdata,LBdata))*FRIfracopt[i]
+    PhiBbol=PhiB*np.abs(np.gradient(Lboloptdata,LBdata))*((FRIIfracopt[i])) #account for the fraction of sources in the optical sample
+    PhiBbold=PhiBd*np.abs(np.gradient(Lboloptdata,LBdata))*FRIIfracopt[i]
+    PhiBbolu=PhiBu*np.abs(np.gradient(Lboloptdata,LBdata))*FRIIfracopt[i]
     sigmaBbold= PhiBbol - PhiBbold
     sigmaBbolu= PhiBbolu - PhiBbol
     logPhi = np.log10(PhiBbol)
-    log_phi_pos_err = np.abs(sigmaBbolu / (PhiBbol * np.log(10)))
+    log_phi_pos_err = np.abs(sigmaBbolu / (PhiBbol * np.log(10))) #propogation
     log_phi_neg_err = np.abs(sigmaBbold / (PhiBbol * np.log(10))) 
     err = log_phi_pos_err + log_phi_neg_err
     err = np.where(np.isnan(err), np.nanmean(err), err)
@@ -138,8 +138,8 @@ for i, (zz, file_name) in enumerate(zip(zvalues, file_list)): #take the qlf file
         # Computing the corresponding y-values using the fitted model
         fitted_curve_y = model.predict(fitted_curve_x.reshape(-1, 1))
         
-        Phikin21conv = np.where(Phikin21conv < 1.0e-15, 1.0e-15, Phikin21conv)
-        PhikinFRII21 = np.where(PhikinFRII21 < 1.0e-25, 1.0e-25, PhikinFRII21)
+        Phikinscatter2 = np.where(Phikinscatter2 < 1.0e-15, 1.0e-15, Phikinscatter2)
+        PhikinFRIIscatter2 = np.where(PhikinFRIIscatter2 < 1.0e-25, 1.0e-25, PhikinFRIIscatter2)
     
         gk, sampler_chain, labels, samples, sampler = MCMC_Fit(Lboloptdata, err, PhiBbol, PhikinFRIIscatter2)
         
